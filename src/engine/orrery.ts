@@ -79,11 +79,11 @@ export class OrrerySim {
 
   step(dt: number, pull: () => CometSpec | null, heat: FamilyHeat, slot: number | null) {
     if (slot != null && slot !== this.lastSlot) {
-      if (this.lastSlot > 0) this.tickFlash = 1
+      if (this.lastSlot > 0 && !this.frozen) this.tickFlash = 1
       this.lastSlot = slot
       this.slot = slot
     }
-    this.tickFlash = Math.max(0, this.tickFlash - dt * 2.4)
+    if (!this.frozen) this.tickFlash = Math.max(0, this.tickFlash - dt * 2.4)
 
     if (this.frozen || this.reduced) {
       this.placePlanets()
@@ -341,8 +341,8 @@ function drawComets(ctx: CanvasRenderingContext2D, R: number, sim: OrrerySim) {
         ctx.lineTo(c.trail[i]!.x * R, c.trail[i]!.y * R)
       }
       ctx.strokeStyle = col
-      ctx.globalAlpha = 0.15 + fade * 0.55
-      ctx.lineWidth = c.failed ? 2.1 : 1.35
+      ctx.globalAlpha = 0.28 + fade * 0.62
+      ctx.lineWidth = c.failed ? 2.4 : 1.7
       ctx.stroke()
     }
     ctx.beginPath()
@@ -393,12 +393,14 @@ function drawPlanets(ctx: CanvasRenderingContext2D, R: number, sim: OrrerySim, g
     ctx.lineWidth = 1
     ctx.stroke()
 
-    const lx = x + (x >= 0 ? rad + 10 : -(rad + 10))
-    const ly = y - rad - 6
+    const len = Math.hypot(x, y) || 1
+    const ox = x / len
+    const oy = y / len
     ctx.fillStyle = PALETTE.ivory
-    ctx.globalAlpha = 0.72
-    ctx.textAlign = x >= 0 ? 'left' : 'right'
-    ctx.fillText(p.label, lx, ly)
+    ctx.globalAlpha = 0.78
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(p.label, x + ox * (rad + Math.max(16, R * 0.045)), y + oy * (rad + Math.max(16, R * 0.045)))
   }
   ctx.globalAlpha = 1
 }

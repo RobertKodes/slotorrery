@@ -60,7 +60,9 @@ export default function App() {
       last = now
       sim.frozen = heldRef.current
       sim.reduced = reducedRef.current
-      sim.warp += (hudRef.current.warp - sim.warp) * Math.min(1, dt * 1.8)
+      if (!heldRef.current) {
+        sim.warp += (hudRef.current.warp - sim.warp) * Math.min(1, dt * 1.8)
+      }
       sim.step(dt, () => pullRef.current(), heatRef.current(), hudRef.current.slot)
       const parent = canvas.parentElement ?? canvas
       const rect = parent.getBoundingClientRect()
